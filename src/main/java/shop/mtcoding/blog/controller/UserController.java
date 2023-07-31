@@ -89,16 +89,19 @@ public class UserController {
     @GetMapping("/joinForm")
     public String joinForm(){
         // templates/ 가 기본이라서 user앞에 /를 붙이지 않는다
+        // => /viewresolver/src/main/resources/templates/user/joinForm.mustache
         return "user/joinForm"; // ViewResolver 는 templates 폴더를 찾아간다
     }
 
     @GetMapping("/loginForm")
     public String loginForm(){
+        // => /viewresolver/src/main/resources/templates/user/loginForm.mustache
         return "user/loginForm";
     }
 
     @GetMapping("/updateForm")
     public String updateForm(){
+        // => /viewresolver/src/main/resources/templates/user/updateForm.mustache
         return "user/updateForm";
     }
 

@@ -8,6 +8,7 @@ public class ErrorController {
     
     @GetMapping("/40x")
     public String ex40x(){
+        // => /viewresolver/src/main/resources/templates/error/ex40x.mustache
         return "error/ex40x";
     }
 }
