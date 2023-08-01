@@ -8,7 +8,7 @@ spring:
   mustache:
     servlet:
       expose-session-attributes: true
-      expose-request-attributer: true
+      expose-request-attributes: true
   datasource:
     url: jdbc:h2:mem:test;MODE=MySQL
     driver-class-name: org.h2.Driver
@@ -20,7 +20,7 @@ spring:
   sql:
     init:
       data-locations:
-      - classpath:db/data.sql
+        - classpath:db/data.sql
   jpa:
     defer-datasource-initialization: true
     hibernate:
@@ -32,4 +32,3 @@ spring:
   output:
     ansi:
       enabled: always
-        

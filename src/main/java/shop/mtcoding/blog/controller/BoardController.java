@@ -7,10 +7,10 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import shop.mtcoding.blog.dto.WriteDTO;
 import shop.mtcoding.blog.model.Board;
@@ -26,12 +26,33 @@ public class BoardController {
     @Autowired
     private BoardRepository boardRepository;
 
-    // 게시글 전체보기
+    // 게시글 전체보기(request 사용)
+    // mustache의 경우 request가 불가능 해서 Model을 사용했는데 사용할 수 있는 코드를 yml에 넣으면 request를 사용해도 된다
+    // localhost:8080
     @GetMapping({"/", "/board"})
-    public String index(Model model){
-        List<Board> boardList = boardRepository.findAll();
-        model.addAttribute("boardList", boardList);
-        // => /viewresolver/src/main/resources/templates/index.mustache
+    // @RequestParam : 값이 안들어오면 원하는 값을 넣어줌
+    // @RequestParam(defaultValue = "0") : 쿼리스트링은 문자열이기 때문에 ""를 이용해서 넣고 페이징은 처음에 0이 들어와야 해서 디폴트 값을 0으로 넣는다
+    public String index(@RequestParam(defaultValue = "0") Integer page, HttpServletRequest request){
+        // 유효성 검사, 인증 검사는 필요 없다
+
+        List<Board> boardList = boardRepository.findAll(0);
+
+        // 조회가 잘되는지 테스트 해보기
+        System.out.println("테스트 : " + boardList.size());
+        System.out.println("테스트 : " + boardList.get(0).getTitle());
+
+        // 화면에 뿌려주기 위해서 request에 담아야 한다
+        request.setAttribute("boardList", boardList);
+
+        // 페이지가 넘어가기 위해서 page를 알고 있으니까 바인딩을 한다
+        request.setAttribute("prevPage", page - 1);
+        request.setAttribute("nextPage", page + 1);
+
+        // 첫번째 페이지와 마지막 페이지면 페이징 되지 않게 하기
+        request.setAttribute("first", page == 0 ? true : false);
+        // 쿼리로 전체페이지 갯수를 찾아내서 last
+        request.setAttribute("last", false);
+
         return "index";
     }
 
@@ -72,9 +93,7 @@ public class BoardController {
     // 게시글 상세보기
     // localhost:8080/board/1
     @GetMapping("/board/{id}")
-    public String detail(@PathVariable Integer id, Model model){
-        Board boardDetail = boardRepository.findById(id);
-        model.addAttribute("boardDetail", boardDetail);
+    public String detail(@PathVariable Integer id){
         // => /viewresolver/src/main/resources/templates/board/detail.mustache
         return "board/detail";
     }
