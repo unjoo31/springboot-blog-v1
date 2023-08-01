@@ -8,6 +8,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import shop.mtcoding.blog.dto.JoinDTO;
+import shop.mtcoding.blog.dto.LoginDTO;
+import shop.mtcoding.blog.model.User;
 
 // IoC 컨테이너에 떠있는 것들
 // 직접 띄운것 : BoardController, UserController, UserRepository
@@ -18,7 +20,15 @@ public class UserRepository {
     @Autowired
     private EntityManager em;
 
-    // 
+    // 로그인
+    public User findByUsernameAndPassword(LoginDTO loginDTO){
+        Query query = em.createNativeQuery("select * from user_tb where username = :username AND password = :password", User.class);
+        query.setParameter("username", loginDTO.getUsername());
+        query.setParameter("password", loginDTO.getPassword());
+        return (User) query.getSingleResult();
+    }
+
+    // 회원가입
     @Transactional
     public void save(JoinDTO joinDTO){
         Query query = em.createNativeQuery("insert into user_tb(username, password, email) values(:username, :password, :email)");
