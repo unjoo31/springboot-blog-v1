@@ -28,6 +28,8 @@ public class UserController {
     @Autowired
     private HttpSession session;
 
+    
+
     // 로그인
     @PostMapping("/login")
     public String login(LoginDTO loginDTO){
@@ -144,8 +146,11 @@ public class UserController {
         return "user/updateForm";
     }
 
+    // 로그아웃
     @GetMapping("/logout")
     public String logout() {
+        // 로그아웃하면 세션을 비워버린다 (세션 무효화) (내 서랍을 비우는 것)
+        session.invalidate();
         return "redirect:/";
     }
 }

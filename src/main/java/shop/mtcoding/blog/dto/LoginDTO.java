@@ -3,7 +3,6 @@ package shop.mtcoding.blog.dto;
 import lombok.Getter;
 import lombok.Setter;
 
-
 // 로그인 api
 // 1. URL : http://localhost:8080/login
 // 2. method : POST (로그인은 select 이지만 post로 한다)
