@@ -11,4 +11,10 @@ public class ErrorController {
         // => /viewresolver/src/main/resources/templates/error/ex40x.mustache
         return "error/ex40x";
     }
+
+    @GetMapping("/50x")
+    public String ex50x(){
+        // => /viewresolver/src/main/resources/templates/error/ex50x.mustache
+        return "error/ex50x";
+    }
 }

@@ -36,7 +36,13 @@ public class UserController {
                 return "redirect:/40x";
             }
 
-            userRepository.save(joinDTO);
+            // 중복되는 계정으로 회원가입하는 경우 예외처리
+            try {
+                userRepository.save(joinDTO);
+            } catch (Exception e) {
+                return "redirect:/50x";
+            }
+            
             return "redirect:/loginForm";
         }
 
