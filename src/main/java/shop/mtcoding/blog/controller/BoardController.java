@@ -1,14 +1,19 @@
 package shop.mtcoding.blog.controller;
 
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import shop.mtcoding.blog.dto.WriteDTO;
+import shop.mtcoding.blog.model.Board;
 import shop.mtcoding.blog.model.User;
 import shop.mtcoding.blog.repository.BoardRepository;
 
@@ -21,12 +26,16 @@ public class BoardController {
     @Autowired
     private BoardRepository boardRepository;
 
+    // 게시글 전체보기
     @GetMapping({"/", "/board"})
-    public String index(){
+    public String index(Model model){
+        List<Board> boardList = boardRepository.findAll();
+        model.addAttribute("boardList", boardList);
         // => /viewresolver/src/main/resources/templates/index.mustache
         return "index";
     }
 
+    // 게시글 작성
     @PostMapping("/board/save")
     public String save(WriteDTO writeDTO) {
         // validation check (유효성 검사)
@@ -47,6 +56,7 @@ public class BoardController {
         return "redirect:/";
     }
 
+    // 미 로그인 시 게시글 작성 불가능
     @GetMapping("/board/saveForm")
     public String saveForm(){
         // session 정보를 가져온다
@@ -59,9 +69,12 @@ public class BoardController {
         return "board/saveForm";
     }
 
+    // 게시글 상세보기
     // localhost:8080/board/1
     @GetMapping("/board/{id}")
-    public String detail(@PathVariable Integer id){
+    public String detail(@PathVariable Integer id, Model model){
+        Board boardDetail = boardRepository.findById(id);
+        model.addAttribute("boardDetail", boardDetail);
         // => /viewresolver/src/main/resources/templates/board/detail.mustache
         return "board/detail";
     }

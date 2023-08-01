@@ -20,6 +20,7 @@ public class ErrorController {
         return "error/ex50x";
     }
     
+    // 이상한 접근 에러
     @GetMapping("/40x")
     public String ex40x(){
         // => /viewresolver/src/main/resources/templates/error/ex40x.mustache
