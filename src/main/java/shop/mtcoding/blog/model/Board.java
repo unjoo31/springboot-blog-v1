@@ -28,6 +28,7 @@ public class Board {
     private String content;
     private Timestamp createdAt;
 
+    // 게시글이 n이기 때문에 fk를 둔다
     @ManyToOne
     private User user;
 }
