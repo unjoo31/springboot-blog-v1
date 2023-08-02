@@ -26,6 +26,25 @@ public class BoardController {
     @Autowired
     private BoardRepository boardRepository;
 
+    // 게시글 삭제
+    @PostMapping("/board/{id}/delete")
+    public String delete(@PathVariable int id){ // 1. PathVariable
+        // 2. 인증검사 (로그인 되어 있지 않으면 로그인 페이지 보내기)
+        // session에 접근해서 sessionUser키값을 가져오세요
+        // null이면 로그인페이지로 보내고 null아니면 3번을 실행하세요
+        User sessionUser = (User) session.getAttribute("sessionUser");
+        if(sessionUser == null){
+            return "redirect:/login";
+        }
+
+        // 3. 모델에 접근해서 삭제 
+        // boardRepository.deleteById(id); 호출하고 리턴을 받지 마세요
+        // delete from board_tb where id = :id
+        boardRepository.deleteById(id);
+
+        return "redirect:/";
+    }
+
     // 게시글 전체보기(request 사용)
     // mustache의 경우 request가 불가능 해서 Model을 사용했는데 사용할 수 있는 코드를 yml에 넣으면 request를 사용해도 된다
     // localhost:8080
@@ -104,8 +123,20 @@ public class BoardController {
     // 게시글 상세보기
     // localhost:8080/board/1
     @GetMapping("/board/{id}")
-    public String detail(@PathVariable Integer id){
+    public String detail(@PathVariable Integer id, HttpServletRequest request){ // c
+        // 권한체크를 하기 위해서 session에 접근한다
+        User sessionUser = (User) session.getAttribute("sessionUser");
+        Board board = boardRepository.findById(id); // m
+
+        boolean pageOwner = false;
+        // 로그인 되어 있으면 권한을 비교한다
+        if(sessionUser != null){
+            pageOwner = sessionUser.getId() == board.getUser().getId();
+        }
+        
+        request.setAttribute("board", board);
+        request.setAttribute("pageOwner", pageOwner);
         // => /viewresolver/src/main/resources/templates/board/detail.mustache
-        return "board/detail";
+        return "board/detail"; // v
     }
 }

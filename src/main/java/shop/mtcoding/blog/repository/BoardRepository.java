@@ -19,6 +19,14 @@ public class BoardRepository {
     @Autowired
     private EntityManager em;
 
+    // 게시글 삭제
+    @Transactional
+    public void deleteById(int id){
+        Query query = em.createNativeQuery("delete from board_tb where id = :id");
+        query.setParameter("id", id);
+        query.executeUpdate();
+    }
+
     // 게시글 목록 전체보기
     // localhost:8080?page=0
     public List<Board> findAll(int page){
@@ -66,5 +74,13 @@ public class BoardRepository {
         query.setParameter("content", writeDTO.getContent());
         query.setParameter("userId", userId);
         query.executeUpdate();
+    }
+
+    // 게시글 상세보기
+    public Board findById(Integer id) {
+        Query query = em.createNativeQuery("select * from board_tb where id = :id", Board.class);
+        query.setParameter("id", id);
+        Board board = (Board) query.getSingleResult();
+        return board;
     }
 }
