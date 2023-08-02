@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import shop.mtcoding.blog.dto.UpdateDTO;
 import shop.mtcoding.blog.dto.WriteDTO;
 import shop.mtcoding.blog.model.Board;
 import shop.mtcoding.blog.model.User;
@@ -26,6 +27,49 @@ public class BoardController {
     @Autowired
     private BoardRepository boardRepository;
 
+    // 게시글 수정
+    @PostMapping("/board/{id}/update")
+    public String update(@PathVariable Integer id, UpdateDTO updateDTO){
+        // 1. 인증 검사
+        User sessionUser = (User) session.getAttribute("sessionUser");
+        if(sessionUser == null){
+            return "redirect:/login";
+        }
+
+        // 2. 권한 체크
+        Board board = boardRepository.findById(id);
+        if(board.getUser().getId() != sessionUser.getId()){
+            return "redirect:/40x"; // 403 권한없음
+        }
+
+        // 3. 핵심 로직
+        // update board_tb set title = :title, content = :content where id = :id
+        boardRepository.update(id, updateDTO);
+
+        return "redirect:/board/" + id;
+    }
+
+    // 게시글 수정페이지
+    @GetMapping("/board/{id}/updateForm")
+    public String updateForm (@PathVariable int id, HttpServletRequest request){
+        // 1. 인증 검사
+        User sessionUser = (User) session.getAttribute("sessionUser");
+        if(sessionUser == null){
+            return "redirect:/login";
+        }
+
+        // 2. 권한 체크
+        Board board = boardRepository.findById(id);
+        if(board.getUser().getId() != sessionUser.getId()){
+            return "redirect:/40x"; // 403 권한없음
+        }
+
+        // 3. 핵심 로직
+        // 기존에 조회했던 것을 사용해서 게시글 내용을 불러온다
+        request.setAttribute("board", board);
+        return "board/updateForm";
+    }
+
     // 게시글 삭제
     @PostMapping("/board/{id}/delete")
     public String delete(@PathVariable int id){ // 1. PathVariable
@@ -37,7 +81,14 @@ public class BoardController {
             return "redirect:/login";
         }
 
-        // 3. 모델에 접근해서 삭제 
+        // 3. 권한검사
+        // 게시글의 id와 session의 id가 같은지 검사한다
+        Board board = boardRepository.findById(id);
+        if(board.getUser().getId() != sessionUser.getId()){
+            return "redirect:/40x"; // 403 권한없음
+        }
+
+        // 4. 모델에 접근해서 삭제 
         // boardRepository.deleteById(id); 호출하고 리턴을 받지 마세요
         // delete from board_tb where id = :id
         boardRepository.deleteById(id);

@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import shop.mtcoding.blog.dto.UpdateDTO;
 import shop.mtcoding.blog.dto.WriteDTO;
 import shop.mtcoding.blog.model.Board;
 
@@ -82,5 +83,15 @@ public class BoardRepository {
         query.setParameter("id", id);
         Board board = (Board) query.getSingleResult();
         return board;
+    }
+
+    // 게시글 업데이트
+    @Transactional
+    public void update(Integer id, UpdateDTO updateDTO) {
+        Query query = em.createNativeQuery("update board_tb set title = :title, content = :content where id = :id");
+        query.setParameter("id", id);
+        query.setParameter("title", updateDTO.getTitle());
+        query.setParameter("content", updateDTO.getTitle());
+        query.executeUpdate();
     }
 }
