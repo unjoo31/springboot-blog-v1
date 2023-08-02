@@ -46,6 +46,7 @@ public class BoardRepository {
     // resultClass 안붙이고 직접 파싱하려면 Object[]로 리턴됨
     // object[0] = 1
     // object[1] = 제목1
+
     // count 갯수
     public int count(){
         // Entity(Board, User) 타입만 가능함
@@ -57,7 +58,7 @@ public class BoardRepository {
         return count.intValue();
     }
 
-    // board 카운트 갯수 내가 만든거
+    // count 갯수 내가 만든거
     public int findCount() {
         Query query = em.createNativeQuery("SELECT COUNT(*) FROM BOARD_TB;");
         BigInteger boardCount = (BigInteger) query.getSingleResult();
