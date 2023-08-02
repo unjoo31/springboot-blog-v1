@@ -15,8 +15,9 @@
 
     <!--disabled-->
     <ul class="pagination d-flex justify-content-center">
+        <!--href="?page={{prevPage}}"와 href="?page={{nextPage}}"는 {{prevPage}}와 {{nextPage}}라는 Mustache 플레이스홀더를 사용하여 해당 페이지의 링크를 동적으로 생성-->
         <li class="page-item {{#first}}disabled{{/first}}"><a class="page-link" href="?page={{prevPage}}">Previous</a></li>
-        <li class="page-item"><a class="page-link" href="?page={{nextPage}}">Next</a></li>
+        <li class="page-item {{#last}}disabled{{/last}}"><a class="page-link" href="?page={{nextPage}}">Next</a></li>
     </ul>
 
 </div>

@@ -35,7 +35,14 @@ public class BoardController {
     public String index(@RequestParam(defaultValue = "0") Integer page, HttpServletRequest request){
         // 유효성 검사, 인증 검사는 필요 없다
 
-        List<Board> boardList = boardRepository.findAll(0);
+        List<Board> boardList = boardRepository.findAll(0); // page : 1
+        // count를 가지고 와서 페이징 하기
+        int totalCount = boardRepository.count(); // totalCount = 5
+        int totalPage = totalCount / 3; // totalPage = 1
+        if(totalCount % 3 > 0){
+            totalPage = totalPage +1; // totalPage = 2
+        }
+        boolean last = totalPage + 1 == page;
 
         // 조회가 잘되는지 테스트 해보기
         System.out.println("테스트 : " + boardList.size());
@@ -49,9 +56,13 @@ public class BoardController {
         request.setAttribute("nextPage", page + 1);
 
         // 첫번째 페이지와 마지막 페이지면 페이징 되지 않게 하기
+        // 삼항연상자 이용함(? true : false -> page가 0과 같으면 결과는 true가 되고, 그렇지 않으면 결과는 false가 됨)
         request.setAttribute("first", page == 0 ? true : false);
-        // 쿼리로 전체페이지 갯수를 찾아내서 last
-        request.setAttribute("last", false);
+
+        // 쿼리로 전체페이지 갯수를 찾아내서 last에 넣는다
+        request.setAttribute("last", last);
+        request.setAttribute("totalPage", totalPage);
+        request.setAttribute("totalCount", totalCount);
 
         return "index";
     }
