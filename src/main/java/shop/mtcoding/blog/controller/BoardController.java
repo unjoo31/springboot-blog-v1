@@ -115,8 +115,8 @@ public class BoardController {
         boolean last = totalPage + 1 == page;
 
         // 조회가 잘되는지 테스트 해보기
-        System.out.println("테스트 : " + boardList.size());
-        System.out.println("테스트 : " + boardList.get(0).getTitle());
+        // System.out.println("테스트 : " + boardList.size());
+        // System.out.println("테스트 : " + boardList.get(0).getTitle());
 
         // 화면에 뿌려주기 위해서 request에 담아야 한다
         request.setAttribute("boardList", boardList);

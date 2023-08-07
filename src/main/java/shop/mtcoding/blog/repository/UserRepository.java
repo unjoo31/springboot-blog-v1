@@ -20,6 +20,13 @@ public class UserRepository {
     @Autowired
     private EntityManager em;
 
+    // 회원가입 시 동일 계정잡기
+    public User findByUsername(String username){
+        Query query = em.createNativeQuery("select * from user_tb where username = :username", User.class);
+        query.setParameter("username", username);
+        return (User) query.getSingleResult();
+    }
+
     // 로그인
     public User findByUsernameAndPassword(LoginDTO loginDTO){
         Query query = em.createNativeQuery("select * from user_tb where username = :username AND password = :password", User.class);
@@ -29,12 +36,16 @@ public class UserRepository {
     }
 
     // 회원가입
-    @Transactional
+    @Transactional // 1. 일의 최소 단위 2. 고립성
     public void save(JoinDTO joinDTO){
+        System.out.println("테스트 : " + 1);
         Query query = em.createNativeQuery("insert into user_tb(username, password, email) values(:username, :password, :email)");
+        System.out.println("테스트 : " + 2);
         query.setParameter("username", joinDTO.getUsername());
         query.setParameter("password", joinDTO.getPassword());
         query.setParameter("email", joinDTO.getEmail());
-        query.executeUpdate();
+        System.out.println("테스트 : " + 3);
+        query.executeUpdate(); // 쿼리를 전송 (DBMS)
+        System.out.println("테스트 : " + 4);
     }
 }

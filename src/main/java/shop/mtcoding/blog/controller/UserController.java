@@ -56,7 +56,6 @@ public class UserController {
     // 회원가입
     @PostMapping("/join")
     public String join(JoinDTO joinDTO) {
-
         // validation check (유효성 검사)
         // 프론트에서 막힌 사람들은 타지 않지만 공격자들을 걸러낸다
         if (joinDTO.getUsername() == null || joinDTO.getUsername().isEmpty()) {
@@ -69,15 +68,15 @@ public class UserController {
             return "redirect:/40x";
         }
 
-        // 핵심기능
-        // 중복되는 계정으로 회원가입하는 경우 예외처리
+        // 동일한 계정으로 회원가입 할 경우 에러페이지로 이동하기
+        // DB에 해당 username이 있는지 체크해보기 -> 있으면 에러 없으면 회원가입 처리
         try {
-            userRepository.save(joinDTO);
-        } catch (Exception e) {
+            userRepository.findByUsername(joinDTO.getUsername());
             return "redirect:/50x";
+        } catch (Exception e) {
+            userRepository.save(joinDTO);
+            return "redirect:/loginForm";
         }
-
-        return "redirect:/loginForm";
     }
 
     // // 정상인
