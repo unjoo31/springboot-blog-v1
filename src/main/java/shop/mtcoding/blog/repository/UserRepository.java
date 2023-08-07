@@ -22,9 +22,14 @@ public class UserRepository {
 
     // 회원가입 시 동일 계정잡기
     public User findByUsername(String username){
-        Query query = em.createNativeQuery("select * from user_tb where username = :username", User.class);
-        query.setParameter("username", username);
-        return (User) query.getSingleResult();
+        try {
+            Query query = em.createNativeQuery("select * from user_tb where username = :username", User.class);
+            query.setParameter("username", username);
+            return (User) query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+        
     }
 
     // 로그인

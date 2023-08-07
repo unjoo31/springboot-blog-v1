@@ -6,12 +6,16 @@ import java.net.http.HttpRequest;
 
 import javax.persistence.PostLoad;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import shop.mtcoding.blog.dto.JoinDTO;
 import shop.mtcoding.blog.dto.LoginDTO;
@@ -28,6 +32,19 @@ public class UserController {
     @Autowired
     private HttpSession session;
 
+    // 아이디 뷰에서 중복체크 하기 -> Ajax 통신
+    // localhost:8080/check?username=ssar
+    // ResponseEntity : @ResponseBody를 붙이지 않아도 데이터를 응답할 수 있다. 상태코드를 직접 입력하지 않아도 된다.
+    @GetMapping("/check")
+    public ResponseEntity<String> check(String username){
+        User user = userRepository.findByUsername(username);
+        if(user != null){
+            // ResponseEntity<>("중복됨", HttpStatus.BAD_REQUEST) : ("응답내용", 상태코드)
+            // HttpStatus : 국제적인 상태코드 표준
+            return new ResponseEntity<>("유저네임이 중복 되었습니다", HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>("유저네임을 사용할 수 있습니다", HttpStatus.OK);
+    }
 
     // 로그인
     @PostMapping("/login")
@@ -70,13 +87,12 @@ public class UserController {
 
         // 동일한 계정으로 회원가입 할 경우 에러페이지로 이동하기
         // DB에 해당 username이 있는지 체크해보기 -> 있으면 에러 없으면 회원가입 처리
-        try {
-            userRepository.findByUsername(joinDTO.getUsername());
+        User user = userRepository.findByUsername(joinDTO.getUsername());
+        if (user != null) {
             return "redirect:/50x";
-        } catch (Exception e) {
-            userRepository.save(joinDTO);
-            return "redirect:/loginForm";
         }
+        userRepository.save(joinDTO); // 핵심 기능
+        return "redirect:/loginForm";
     }
 
     // // 정상인
