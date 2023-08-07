@@ -5,8 +5,8 @@
     <div class="card">
         <div class="card-header"><b>회원가입을 해주세요</b></div>
         <div class="card-body">
-            <!-- onsubmit="return valid()" : 회원가입 button -> submit 하기전에 valid()를 무조건 실행하고 실행한다 -->
-            <form action="/join" method="POST" enctype="application/x-www-form-urlencoded" onsubmit="return valid()">
+            <!-- onsubmit="return valid()" : 회원가입 button -> submit 하기전에 valid()를 무조건 실행하고 true를 리턴받으면 submit을 실행한다 -->
+            <form action="/join" method="POST" enctype="application/x-www-dform-urlencoded" onsubmit="return valid()">
                 <div class="mb-3">
                     <input type="text" id="username" class="form-control" placeholder="Enter username" name="username"
                         required maxlength="20" onchange="usernameChange()">
@@ -46,22 +46,26 @@
     // async : await를 사용하려면 function앞에 꼭 붙여야 하는 문법!
     async function check() {
         // 1. DOM으로 부터 값 가져오기
+        // HTML 문서 내에서 id가 "username"인 요소의 값을 가져옵니다.
         let username = document.querySelector("#username").value;
-        //console.log("유저네임", username);
 
         // 2. 통신하기
+        // fetch 함수를 사용하여 /check?username=${username} 경로로 GET 요청을 보냅니다.
         // ``사용해서 ${username}을 받는다
         // await : 이벤트 루프에 등록된 fetch를 기다렸다가 response에 들어가
+        // await 키워드를 사용하여 서버 응답이 올 때까지 기다립니다.
         let response = await fetch(`/check?username=${username}`);
+        console.log(response);
 
         // 3. 파싱하기
         // UserController에서 public ResponseEntity<String> -> String을 리턴하기 때문에 response.text()를 파싱한다
+        // 서버 응답을 문자열로 파싱합니다.
         let responseBody = await response.text(); // response.json();
-        console.log(responseBody);
         // 스프링부트 응답의 기본 전략은 오브젝트를 리턴하면 json으로 파싱해준다 -> reponse.json();
 
         // 4. 상태코드 확인
         // 5. 비지니스 로직
+        //  id가 "btnJoin"인 요소를 가져옵니다.
         let btnJoin = document.querySelector("#btnJoin");
         if (response.status == 200) {
             alert(responseBody);
