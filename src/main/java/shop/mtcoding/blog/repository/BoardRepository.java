@@ -123,12 +123,19 @@ public class BoardRepository {
 
         Query query = em.createNativeQuery(sql);
         query.setParameter("boardId", boardId);
+
+        // 로그인 했으면
         if (sessionUserId != null) {
             query.setParameter("sessionUserId", sessionUserId);
         }
 
+        // DTO를 받기 때문에 qlrm 사용함
         JpaResultMapper mapper = new JpaResultMapper();
         List<BoardDetailDTO> dtos = mapper.list(query, BoardDetailDTO.class);
+        
+        // replyOwner값 궁금해서 테스트
+        System.out.println("진짜 테스트"+dtos.get(0).isReplyOwner());
+        System.out.println("진짜 테스트"+dtos.get(1).isReplyOwner());
         return dtos;
     }
 }

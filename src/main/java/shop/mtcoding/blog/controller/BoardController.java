@@ -198,7 +198,10 @@ public class BoardController {
     // localhost:8080/board/1
     @GetMapping("/board/{id}")
     public String detail(@PathVariable Integer id, HttpServletRequest request) { // C
-        User sessionUser = (User) session.getAttribute("sessionUser"); // 세션접근
+        // session 정보를 가져온다
+        User sessionUser = (User) session.getAttribute("sessionUser");
+
+        // sessionUser가 null인지 아닌지에 따라서 매개변수로 값을 다르게 넘기기
         List<BoardDetailDTO> dtos = null;
         if (sessionUser == null) {
             dtos = boardRepository.findByIdJoinReply(id, null);
@@ -206,9 +209,10 @@ public class BoardController {
             dtos = boardRepository.findByIdJoinReply(id, sessionUser.getId());
         }
 
+        // 로그인 했으면 sessionUser와 게시글id를 비교해서 true/false 값을 pageOwner에 담기
+        // 담은 거 detail.mustache에서 게시글 삭제, 수정 버튼 노출,미노출 보여줌
         boolean pageOwner = false;
         if (sessionUser != null) {
-            System.out.println("테스트 세션 ID : " + sessionUser.getId());
             pageOwner = sessionUser.getId() == dtos.get(0).getBoardUserId();
         }
 

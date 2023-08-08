@@ -49,7 +49,7 @@
                 </div>
                 {{#replyOwner}}
                 <form action="/reply/{{replyId}}/delete" method="post">
-                    <button class="btn">🗑</button>
+                    <button class="btn">{{replyOwner}}🗑</button>
                 </form>
                 {{/replyOwner}}
             </div>
