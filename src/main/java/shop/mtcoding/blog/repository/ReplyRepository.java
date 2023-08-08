@@ -1,5 +1,7 @@
 package shop.mtcoding.blog.repository;
 
+import java.util.List;
+
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
@@ -9,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import shop.mtcoding.blog.dto.ReplyWriteDTO;
 import shop.mtcoding.blog.dto.WriteDTO;
+import shop.mtcoding.blog.model.Reply;
 
 // 현재 IoC컨테이너에 띄워져있는 것
 // 내가 띄운 것 : UserController, BoardController, ReplyController, ErrorControlelr
@@ -19,6 +22,13 @@ public class ReplyRepository {
     
     @Autowired
     private EntityManager em;
+
+    // 게시글 가져오기
+    public List<Reply> findByBoardId(Integer boardId) {
+        Query query = em.createNativeQuery("select * from reply_tb where board_id = :boardId", Reply.class);
+        query.setParameter("boardId", boardId);
+        return query.getResultList();
+    }
 
     // 댓글 저장
     @Transactional
@@ -32,5 +42,4 @@ public class ReplyRepository {
         query.setParameter("userId", userId);
         query.executeUpdate(); // 쿼리 전송
     }
-
 }

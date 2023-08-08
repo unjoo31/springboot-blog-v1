@@ -11,12 +11,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
+import shop.mtcoding.blog.dto.BoardDetailDTO;
 import shop.mtcoding.blog.dto.UpdateDTO;
 import shop.mtcoding.blog.dto.WriteDTO;
 import shop.mtcoding.blog.model.Board;
+import shop.mtcoding.blog.model.Reply;
 import shop.mtcoding.blog.model.User;
 import shop.mtcoding.blog.repository.BoardRepository;
+import shop.mtcoding.blog.repository.ReplyRepository;
 
 @Controller
 public class BoardController {
@@ -26,6 +30,25 @@ public class BoardController {
 
     @Autowired
     private BoardRepository boardRepository;
+
+    @Autowired
+    private ReplyRepository replyRepository;
+
+    @ResponseBody
+    @GetMapping("/test/reply")
+    public List<Reply> test2(){
+        List<Reply> replys = replyRepository.findByBoardId(1);
+        // 오브젝트를 리턴하면 json 데이터로 리턴해준다
+        return replys;
+    }
+
+    @ResponseBody
+    @GetMapping("/test/board/1")
+    public Board test(){
+        Board board = boardRepository.findById(1);
+        // 오브젝트를 리턴하면 json 데이터로 리턴해준다
+        return board;
+    }
 
     // 게시글 수정
     @PostMapping("/board/{id}/update")
@@ -174,20 +197,26 @@ public class BoardController {
     // 게시글 상세보기
     // localhost:8080/board/1
     @GetMapping("/board/{id}")
-    public String detail(@PathVariable Integer id, HttpServletRequest request){ // c
-        // 권한체크를 하기 위해서 session에 접근한다
-        User sessionUser = (User) session.getAttribute("sessionUser");
-        Board board = boardRepository.findById(id); // m
+    public String detail(@PathVariable Integer id, HttpServletRequest request) { // C
+        User sessionUser = (User) session.getAttribute("sessionUser"); // 세션접근
+        List<BoardDetailDTO> dtos = null;
+        if (sessionUser == null) {
+            dtos = boardRepository.findByIdJoinReply(id, null);
+        } else {
+            dtos = boardRepository.findByIdJoinReply(id, sessionUser.getId());
+        }
 
         boolean pageOwner = false;
-        // 로그인 되어 있으면 권한을 비교한다
-        if(sessionUser != null){
-            pageOwner = sessionUser.getId() == board.getUser().getId();
+        if (sessionUser != null) {
+            System.out.println("테스트 세션 ID : " + sessionUser.getId());
+            // System.out.println("테스트 세션 board.getUser().getId() : " +
+            // board.getUser().getId());
+            pageOwner = sessionUser.getId() == dtos.get(0).getBoardUserId();
+            // System.out.println("테스트 : pageOwner : " + pageOwner);
         }
-        
-        request.setAttribute("board", board);
+
+        request.setAttribute("dtos", dtos);
         request.setAttribute("pageOwner", pageOwner);
-        // => /viewresolver/src/main/resources/templates/board/detail.mustache
-        return "board/detail"; // v
+        return "board/detail"; // V
     }
 }
