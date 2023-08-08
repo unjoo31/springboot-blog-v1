@@ -1,0 +1,36 @@
+package shop.mtcoding.blog.repository;
+
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+import shop.mtcoding.blog.dto.ReplyWriteDTO;
+import shop.mtcoding.blog.dto.WriteDTO;
+
+// 현재 IoC컨테이너에 띄워져있는 것
+// 내가 띄운 것 : UserController, BoardController, ReplyController, ErrorControlelr
+// 내가 띄운 것 : serRepository, BoardRepository, ReplyRepository
+// 그냥 떠있는 것 : EntityManager, HttpSession
+@Repository
+public class ReplyRepository {
+    
+    @Autowired
+    private EntityManager em;
+
+    // 댓글 저장
+    @Transactional
+    public void save(ReplyWriteDTO replyWriteDTO, Integer userId) {
+        Query query = em
+                .createNativeQuery(
+                        "insert into reply_tb(comment, board_id, user_id) values(:comment, :boardId, :userId)");
+
+        query.setParameter("comment", replyWriteDTO.getComment());                
+        query.setParameter("boardId", replyWriteDTO.getBoardId());
+        query.setParameter("userId", userId);
+        query.executeUpdate(); // 쿼리 전송
+    }
+
+}
