@@ -114,13 +114,13 @@ public class BoardRepository {
         } else {
             sql += "case when r.user_id = :sessionUserId then true else false end reply_owner ";
         }
-
         sql += "from board_tb b left outer join reply_tb r ";
         sql += "on b.id = r.board_id ";
         sql += "left outer join user_tb ru ";
         sql += "on r.user_id = ru.id ";
         sql += "where b.id = :boardId ";
         sql += "order by r.id desc";
+
         Query query = em.createNativeQuery(sql);
         query.setParameter("boardId", boardId);
         if (sessionUserId != null) {

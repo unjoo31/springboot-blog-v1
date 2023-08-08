@@ -209,10 +209,7 @@ public class BoardController {
         boolean pageOwner = false;
         if (sessionUser != null) {
             System.out.println("테스트 세션 ID : " + sessionUser.getId());
-            // System.out.println("테스트 세션 board.getUser().getId() : " +
-            // board.getUser().getId());
             pageOwner = sessionUser.getId() == dtos.get(0).getBoardUserId();
-            // System.out.println("테스트 : pageOwner : " + pageOwner);
         }
 
         request.setAttribute("dtos", dtos);
