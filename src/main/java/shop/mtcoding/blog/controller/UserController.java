@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import shop.mtcoding.blog.dto.JoinDTO;
 import shop.mtcoding.blog.dto.LoginDTO;
+import shop.mtcoding.blog.dto.UserUpdateDTO;
 import shop.mtcoding.blog.model.User;
 import shop.mtcoding.blog.repository.UserRepository;
 
@@ -58,13 +60,21 @@ public class UserController {
             return "redirect:/exLogin";
         }
 
+        // boolean isValid = BCrypt.checkpw("1234", encPassword);
+        // String encPassword = BCrypt.hashpw(joinDTO.getPassword(), BCrypt.gensalt());
+        
         // 핵심기능
-        // 계정이 없다면 로그인 에러 페이지로 이동, 계정이 있다면 메인으로 이동
         try {
-            User user = userRepository.findByUsernameAndPassword(loginDTO);
-            // 로그인이 되면 session에 저장을 해둬야한다
-            session.setAttribute("sessionUser", user);
-            return "redirect:/";
+            User user = userRepository.findByUsername(loginDTO.getUsername());
+
+            if(BCrypt.checkpw(loginDTO.getPassword(), user.getPassword())){
+                System.out.println("해시"+user.getPassword());
+                System.out.println("해시"+loginDTO.getPassword());
+                session.setAttribute("sessionUser", user);
+                return "redirect:/"; 
+            }else{
+                return "redirect:/exLogin";
+            }                                                 
         } catch (Exception e) {
             return "redirect:/exLogin";
         }
@@ -91,9 +101,31 @@ public class UserController {
         if (user != null) {
             return "redirect:/50x";
         }
+
+        String encPassword = BCrypt.hashpw(joinDTO.getPassword(), BCrypt.gensalt());
+        joinDTO.setPassword(encPassword);
+
         userRepository.save(joinDTO); // 핵심 기능
         return "redirect:/loginForm";
     }
+
+    // 업데이트
+    @PostMapping("/user/update")
+    public String update(UserUpdateDTO userUpdateDTO){
+        // 인증 검사
+        User sessionUser = (User) session.getAttribute("sessionUser");
+        if(sessionUser == null){
+            return "redirect:/login";
+        }
+
+        // 핵심 로직
+        String encPassword = BCrypt.hashpw(userUpdateDTO.getPassword(), BCrypt.gensalt());
+        userUpdateDTO.setPassword(encPassword);
+        userRepository.update(userUpdateDTO);
+        return "redirect:/updateForm";
+    }
+
+
 
     // // 정상인
     // @PostMapping("/join")
@@ -159,6 +191,9 @@ public class UserController {
         // => /viewresolver/src/main/resources/templates/user/updateForm.mustache
         return "user/updateForm";
     }
+
+    
+
 
     // 로그아웃
     @GetMapping("/logout")

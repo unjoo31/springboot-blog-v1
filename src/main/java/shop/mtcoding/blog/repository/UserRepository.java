@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import shop.mtcoding.blog.dto.JoinDTO;
 import shop.mtcoding.blog.dto.LoginDTO;
+import shop.mtcoding.blog.dto.UserUpdateDTO;
 import shop.mtcoding.blog.model.User;
 
 // IoC 컨테이너에 떠있는 것들
@@ -42,15 +43,21 @@ public class UserRepository {
 
     // 회원가입
     @Transactional // 1. 일의 최소 단위 2. 고립성
-    public void save(JoinDTO joinDTO){
-        System.out.println("테스트 : " + 1);
-        Query query = em.createNativeQuery("insert into user_tb(username, password, email) values(:username, :password, :email)");
-        System.out.println("테스트 : " + 2);
+    public void save(JoinDTO joinDTO) {
+        Query query = em
+                .createNativeQuery(
+                        "insert into user_tb(username, password, email) values(:username, :password, :email)");
         query.setParameter("username", joinDTO.getUsername());
         query.setParameter("password", joinDTO.getPassword());
         query.setParameter("email", joinDTO.getEmail());
-        System.out.println("테스트 : " + 3);
         query.executeUpdate(); // 쿼리를 전송 (DBMS)
-        System.out.println("테스트 : " + 4);
+    }     
+
+    // 정보수정
+    @Transactional
+    public void update(UserUpdateDTO userUpdateDTO){
+        Query query = em.createNativeQuery("update user_tb set password = :password");
+        query.setParameter("password", userUpdateDTO.getPassword());
+        query.executeUpdate();
     }
 }
