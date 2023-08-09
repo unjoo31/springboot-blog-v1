@@ -42,4 +42,18 @@ public class ReplyRepository {
         query.setParameter("userId", userId);
         query.executeUpdate(); // 쿼리 전송
     }
+
+    // 댓글 삭제
+    @Transactional
+    public void deleteById(Integer replyId){
+        Query query = em.createNativeQuery("delete from reply_tb where id = :replyId");
+        query.setParameter("replyId", replyId);
+        query.executeUpdate();
+    }
+    
+    public Reply findById(Integer id){
+        Query query = em.createNativeQuery("select * from reply_tb where id = :id", Reply.class);
+        query.setParameter("id", id);
+        return (Reply) query.getSingleResult();
+    }
 }

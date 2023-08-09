@@ -99,6 +99,7 @@ public class BoardRepository {
     }
 
     // 게시글과 댓글 조인
+    // 동적쿼리
     public List<BoardDetailDTO> findByIdJoinReply(Integer boardId, Integer sessionUserId) {
         String sql = "select ";
         sql += "b.id board_id, ";
@@ -132,10 +133,7 @@ public class BoardRepository {
         // DTO를 받기 때문에 qlrm 사용함
         JpaResultMapper mapper = new JpaResultMapper();
         List<BoardDetailDTO> dtos = mapper.list(query, BoardDetailDTO.class);
-        
-        // replyOwner값 궁금해서 테스트
-        System.out.println("진짜 테스트"+dtos.get(0).isReplyOwner());
-        System.out.println("진짜 테스트"+dtos.get(1).isReplyOwner());
+
         return dtos;
     }
 }
