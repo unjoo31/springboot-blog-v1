@@ -51,6 +51,7 @@ public class ReplyRepository {
         query.executeUpdate();
     }
     
+    // 댓글 조회
     public Reply findById(Integer id){
         Query query = em.createNativeQuery("select * from reply_tb where id = :id", Reply.class);
         query.setParameter("id", id);

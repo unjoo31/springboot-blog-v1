@@ -125,14 +125,15 @@ public class BoardController {
     @GetMapping({"/", "/board"})
     // @RequestParam : 값이 안들어오면 원하는 값을 넣어줌
     // @RequestParam(defaultValue = "0") : 쿼리스트링은 문자열이기 때문에 ""를 이용해서 넣고 페이징은 처음에 0이 들어와야 해서 디폴트 값을 0으로 넣는다
-    public String index(String keyword, @RequestParam(defaultValue = "0") Integer page, HttpServletRequest request){
+    public String index(@RequestParam(defaultValue = "") String keyword, @RequestParam(defaultValue = "0") Integer page, HttpServletRequest request){
         // 유효성 검사, 인증 검사는 필요 없다
 
         // 검색을 할때는 keyword가 들어오고, 검색을 하지 않고 들어오면 keyword는 null
         List<Board> boardList = null;
         int totalCount = 0;
         // keyword가 null이면 기존과 동일하고 값이 들어오면 쿼리가 달라져야 함
-        if(keyword == null){
+
+        if(keyword.isBlank()){
             boardList = boardRepository.findAll(page); // page : 1
             totalCount = boardRepository.count(); // totalCount = 5
         }else{
