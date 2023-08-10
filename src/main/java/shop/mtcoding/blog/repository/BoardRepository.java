@@ -44,6 +44,18 @@ public class BoardRepository {
         return query.getResultList();
     }
 
+    // 키워드 검색 게시글 목록 전체보기
+    public List<Board> findAll(int page, String keyword) {
+        final int SIZE = 3;
+        Query query = em.createNativeQuery(
+                "select * from board_tb where title like :keyword order by id desc limit :page, :size", Board.class);
+        query.setParameter("page", page * SIZE);
+        query.setParameter("size", SIZE);
+        query.setParameter("keyword", "%" + keyword + "%");
+
+        return query.getResultList();
+    }
+
     // select id, title from board_tb
     // resultClass 안붙이고 직접 파싱하려면 Object[]로 리턴됨
     // object[0] = 1
@@ -56,6 +68,15 @@ public class BoardRepository {
         
         // 원래는 object 배열로 리턴 받는다, object 배열은 칼럼의 연속이다.
         // 그룹함수를 써서, 하나의 칼럼을 조회하면 object로 리턴된다.
+        BigInteger count = (BigInteger) query.getSingleResult();
+        return count.intValue();
+    }
+
+    // 키워드 검색 count 갯수
+    public int count(String keyword){
+        Query query = em.createNativeQuery("SELECT COUNT(*) FROM BOARD_TB where title like :keyword");
+        query.setParameter("keyword", "%"+keyword+"%");
+        
         BigInteger count = (BigInteger) query.getSingleResult();
         return count.intValue();
     }

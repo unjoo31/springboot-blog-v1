@@ -125,17 +125,28 @@ public class BoardController {
     @GetMapping({"/", "/board"})
     // @RequestParam : 값이 안들어오면 원하는 값을 넣어줌
     // @RequestParam(defaultValue = "0") : 쿼리스트링은 문자열이기 때문에 ""를 이용해서 넣고 페이징은 처음에 0이 들어와야 해서 디폴트 값을 0으로 넣는다
-    public String index(@RequestParam(defaultValue = "0") Integer page, HttpServletRequest request){
+    public String index(String keyword, @RequestParam(defaultValue = "0") Integer page, HttpServletRequest request){
         // 유효성 검사, 인증 검사는 필요 없다
 
-        List<Board> boardList = boardRepository.findAll(0); // page : 1
+        // 검색을 할때는 keyword가 들어오고, 검색을 하지 않고 들어오면 keyword는 null
+        List<Board> boardList = null;
+        int totalCount = 0;
+        // keyword가 null이면 기존과 동일하고 값이 들어오면 쿼리가 달라져야 함
+        if(keyword == null){
+            boardList = boardRepository.findAll(page); // page : 1
+            totalCount = boardRepository.count(); // totalCount = 5
+        }else{
+            boardList = boardRepository.findAll(page, keyword); // page : 1
+            totalCount = boardRepository.count(keyword); // totalCount = 5
+            request.setAttribute("keyword", keyword);
+        }
+
         // count를 가지고 와서 페이징 하기
-        int totalCount = boardRepository.count(); // totalCount = 5
         int totalPage = totalCount / 3; // totalPage = 1
         if(totalCount % 3 > 0){
             totalPage = totalPage +1; // totalPage = 2
         }
-        boolean last = totalPage + 1 == page;
+        boolean last = totalPage - 1 == page;
 
         // 조회가 잘되는지 테스트 해보기
         // System.out.println("테스트 : " + boardList.size());
