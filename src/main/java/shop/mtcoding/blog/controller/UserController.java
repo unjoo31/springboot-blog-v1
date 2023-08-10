@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -66,10 +67,10 @@ public class UserController {
         // 핵심기능
         try {
             User user = userRepository.findByUsername(loginDTO.getUsername());
-
-            if(BCrypt.checkpw(loginDTO.getPassword(), user.getPassword())){
-                System.out.println("해시"+user.getPassword());
-                System.out.println("해시"+loginDTO.getPassword());
+            // 입력한 값 : loginDTO.getPassword() db에 있는 값  : user.getPassword()
+            boolean isValid = BCrypt.checkpw(loginDTO.getPassword(), user.getPassword());
+            
+            if(isValid){
                 session.setAttribute("sessionUser", user);
                 return "redirect:/"; 
             }else{
@@ -124,8 +125,6 @@ public class UserController {
         userRepository.update(userUpdateDTO);
         return "redirect:/updateForm";
     }
-
-
 
     // // 정상인
     // @PostMapping("/join")
@@ -187,13 +186,21 @@ public class UserController {
     }
 
     @GetMapping("/updateForm")
-    public String updateForm() {
+    public String updateForm(HttpServletRequest request) {
+        // session 정보를 가져온다
+        User sessionUser = (User) session.getAttribute("sessionUser");
+        // sessionUser 정보가 없으면 로그인 페이지로 이동
+        if(sessionUser == null){
+            return "redirect:/loginForm";
+        }
+
+        // username을 걸지 않는 이유는 pk가 아니기 때문에 index를 타지 않는다 (uk도 index를 탄다)
+        // index = 목차. 목차이기 때문에 풀 엑세스를 하지 않는다
+        User user = userRepository.findByUsername(sessionUser.getUsername());
+        request.setAttribute("user", user);
         // => /viewresolver/src/main/resources/templates/user/updateForm.mustache
         return "user/updateForm";
     }
-
-    
-
 
     // 로그아웃
     @GetMapping("/logout")
